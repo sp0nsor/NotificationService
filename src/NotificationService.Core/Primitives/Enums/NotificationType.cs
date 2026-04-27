@@ -1,4 +1,4 @@
-﻿namespace NotificationService.Core.Enums
+﻿namespace NotificationService.Core.Primitives.Enums
 {
     public enum NotificationType
     {

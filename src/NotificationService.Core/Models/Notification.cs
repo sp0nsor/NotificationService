@@ -1,8 +1,9 @@
-﻿using NotificationService.Core.Enums;
+﻿using NotificationService.Core.Primitives;
+using NotificationService.Core.Primitives.Enums;
 
 namespace NotificationService.Core.Models
 {
-    public class Notification
+    public class Notification : Entity
     {
         public Notification(
             NotificationType type,
@@ -24,14 +25,13 @@ namespace NotificationService.Core.Models
             Metadata = metadata;
         }
 
-        public Guid Id { get; }
-        public NotificationType Type { get; }
-        public string Sender { get; }
-        public string Recipient { get; }
-        public string Subject { get; }
-        public string Message { get; }
-        public Priority Priority { get; }
-        public DateTime ScheduledAt { get; }
-        public Dictionary<string, string> Metadata { get; }
+        public NotificationType Type { get; init; }
+        public string Sender { get; init; }
+        public string Recipient { get; init; }
+        public string Subject { get; init; }
+        public string Message { get; init; }
+        public Priority Priority { get; init; }
+        public DateTime ScheduledAt { get; init; }
+        public Dictionary<string, string> Metadata { get; init; }
     }
 }
