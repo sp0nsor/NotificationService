@@ -14,3 +14,10 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=root
     ports:
       - "27017"
+  rabbit.mq:
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672"
+      - "15672"

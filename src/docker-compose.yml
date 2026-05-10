@@ -14,8 +14,9 @@ services:
       - notifications-dev
     depends_on:
       - mongo.db
+      - rabbit.mq
   mongo.db:
-    container_name: mongo-db
+    container_name: mongodb
     image: mongo:latest
     ports:
       - "27017:27017"
@@ -23,5 +24,17 @@ services:
       - notifications-dev
     volumes:
       - "mongo-data:/data/db"
+  rabbit.mq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - notifications-dev
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
 volumes:
   mongo-data:
+  rabbitmq-data:

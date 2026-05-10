@@ -10,8 +10,8 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.15" />
 		<PackageReference Include="WolverineFx.RabbitMQ" Version="5.36.2" />
 	</ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\NotificationService.Application\NotificationService.Application.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\NotificationService.Application\NotificationService.Application.csproj" />
+	</ItemGroup>
 
 </Project>
