@@ -6,8 +6,8 @@ using NotificationService.Core.Abstractions.Repositories;
 using NotificationService.Core.Models;
 using NotificationService.DataAccess.Configurations;
 using NotificationService.DataAccess.Data;
+using NotificationService.DataAccess.Options;
 using NotificationService.DataAccess.Repositories;
-using NotificationService.DataAccess.Settings;
 
 namespace NotificationService.DataAccess.Extentions
 {
@@ -17,15 +17,15 @@ namespace NotificationService.DataAccess.Extentions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            var settings = configuration.GetRequiredSection(nameof(MongoDbSettings)).Get<MongoDbSettings>()!;
+            var options = configuration.GetRequiredSection(nameof(MongoDbOptions)).Get<MongoDbOptions>()!;
 
             MongoDbConfiguration.Configure();
 
             services.AddSingleton<IMongoClient>(
-                new MongoClient(settings.ConnectionString));
+                new MongoClient(options.ConnectionString));
             services.AddSingleton(sp =>
                 sp.GetRequiredService<IMongoClient>()
-                    .GetDatabase(settings.DatabaseName));
+                    .GetDatabase(options.DatabaseName));
 
             services.AddScoped<IDbInitializer, DbInitializer>();
             services.AddScoped<IBaseRepository<Notification>, NotificationRepository>();

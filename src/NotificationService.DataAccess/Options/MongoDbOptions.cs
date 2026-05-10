@@ -1,6 +1,6 @@
-﻿namespace NotificationService.DataAccess.Settings
+﻿namespace NotificationService.DataAccess.Options
 {
-    public class MongoDbSettings
+    public class MongoDbOptions
     {
         public required string ConnectionString { get; set; }
         public required string DatabaseName { get; set; }

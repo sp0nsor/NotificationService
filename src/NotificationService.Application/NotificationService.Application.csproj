@@ -10,4 +10,8 @@
     <ProjectReference Include="..\NotificationService.Core\NotificationService.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Notifications\Handlers\" />
+  </ItemGroup>
+
 </Project>
