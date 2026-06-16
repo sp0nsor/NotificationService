@@ -1,8 +1,8 @@
 ﻿namespace NotificationService.Core.Primitives.Enums
 {
-    public enum NotificationType
+    public enum Provider
     {
-        Email,
-        Telegram
+        Email = 0,
+        Telegram = 1,
     }
 }

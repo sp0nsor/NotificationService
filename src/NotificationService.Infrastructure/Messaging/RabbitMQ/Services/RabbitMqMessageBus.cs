@@ -1,6 +1,6 @@
 ﻿using NotificationService.Application.Abstractions.Messaging;
 
-namespace NotificationService.Infrastructure.RabbitMQ.Services
+namespace NotificationService.Infrastructure.Messaging.RabbitMQ.Services
 {
     public class RabbitMqMessageBus : IMessageBus
     {
@@ -12,9 +12,9 @@ namespace NotificationService.Infrastructure.RabbitMQ.Services
         }
 
         public async Task PublishAsync<T>(T message)
-            => await _bus.PublishAsync<T>(message);
+            => await _bus.PublishAsync(message);
 
         public async Task SendAsync<T>(T message)
-            => await _bus.SendAsync<T>(message);
+            => await _bus.SendAsync(message);
     }
 }

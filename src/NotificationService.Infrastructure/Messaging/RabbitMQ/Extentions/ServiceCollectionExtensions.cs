@@ -1,14 +1,18 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using JasperFx.Core;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NotificationService.Application.Exceptions;
 using NotificationService.Application.Notifications.Commands;
-using NotificationService.Infrastructure.RabbitMQ.Services;
-using NotificationService.Infrastructure.RabbitMQ.Settings;
+using NotificationService.Application.Notifications.Handlers;
+using NotificationService.Infrastructure.Messaging.RabbitMQ.Options;
+using NotificationService.Infrastructure.Messaging.RabbitMQ.Services;
 using Wolverine;
+using Wolverine.ErrorHandling;
 using Wolverine.RabbitMQ;
 
-namespace NotificationService.Infrastructure.RabbitMQ.Extentions
+namespace NotificationService.Infrastructure.Messaging.RabbitMQ.Extentions
 {
-    public static class ServiceCollectionExtensions
+    internal static class ServiceCollectionExtensions
     {
         public static void AddRabbitMqMessaging(
             this IServiceCollection services,
@@ -34,7 +38,7 @@ namespace NotificationService.Infrastructure.RabbitMQ.Extentions
                             options.RoutingKey);
                     });
 
-                opts.PublishMessage<SendNotification>()
+                opts.PublishMessage<SendNotificationMessage>()
                     .ToRabbitRoutingKey(options.ExchangeName, options.RoutingKey);
 
                 opts.ListenToRabbitQueue(options.QueueName);
@@ -44,13 +48,20 @@ namespace NotificationService.Infrastructure.RabbitMQ.Extentions
                 opts.Policies.UseDurableOutboxOnAllSendingEndpoints();
                 opts.Policies.UseDurableLocalQueues();
 
-                opts.DefaultExecutionTimeout = TimeSpan.FromMinutes(5);
-                opts.DefaultRemoteInvocationTimeout = TimeSpan.FromMinutes(5);
+                opts.Policies
+                    .OnException<NotificationTemporaryException>()
+                    .RetryWithCooldown(
+                        1.Seconds(),
+                        5.Seconds(),
+                        15.Seconds());
 
+                opts.DefaultExecutionTimeout = TimeSpan.FromMinutes(1);
+                opts.DefaultRemoteInvocationTimeout = TimeSpan.FromMinutes(1);
+
+                opts.Discovery.IncludeAssembly(typeof(SendNotificationHandler).Assembly);
             });
 
             services.AddScoped<Application.Abstractions.Messaging.IMessageBus, RabbitMqMessageBus>();
         }
-
     }
 }
