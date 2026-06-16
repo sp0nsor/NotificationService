@@ -1,37 +1,58 @@
-﻿using NotificationService.Core.Primitives;
+﻿using CSharpFunctionalExtensions;
 using NotificationService.Core.Primitives.Enums;
+using NotificationService.Core.ValueObjects;
 
 namespace NotificationService.Core.Models
 {
-    public class Notification : Entity
+    public class Notification : Primitives.Entity
     {
-        public Notification(
-            NotificationType type,
-            string sender,
-            string recipient,
-            string subject,
-            string message,
-            Priority priority,
-            Dictionary<string, string> metadata)
+        private Notification(
+            Status status,
+            Recipient recipient,
+            Content content,
+            DateTime createdAt)
         {
             Id = Guid.NewGuid();
-            Type = type;
-            Sender = sender;
+            Status = status;
             Recipient = recipient;
-            Subject = subject;
-            Message = message;
-            Priority = priority;
-            ScheduledAt = DateTime.UtcNow;
-            Metadata = metadata;
+            Content = content;
+            CreatedAt = createdAt;
         }
 
-        public NotificationType Type { get; init; }
-        public string Sender { get; init; }
-        public string Recipient { get; init; }
-        public string Subject { get; init; }
-        public string Message { get; init; }
-        public Priority Priority { get; init; }
-        public DateTime ScheduledAt { get; init; }
-        public Dictionary<string, string> Metadata { get; init; }
+        public Status Status { get; private set; }
+        public Recipient Recipient { get; private set; }
+        public Content Content { get; private set; }
+        public DateTime CreatedAt { get; private set; }
+        public DateTime? SentAt { get; private set; }
+        public string? Error { get; private set; }
+
+        public static Result<Notification> Create(Status status, Recipient recipient, Content content)
+        {
+            return new Notification(status, recipient, content, DateTime.UtcNow);
+        }
+
+        public Result ChangeStatus(Status newStatus)
+        {
+            if (Status == Status.Sent)
+            {
+                return Result.Failure("Status cannot be changed after sending.");
+            }
+
+            Status = newStatus;
+
+            if (newStatus == Status.Sent)
+            {
+                SentAt = DateTime.UtcNow;
+            }
+
+            return Result.Success();
+        }
+
+        public Result SetLastError(string error)
+        {
+            Error = error;
+
+            return Result.Success();
+        }
     }
 }

@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-using NotificationService.Core.Abstractions;
-using NotificationService.Core.Abstractions.Repositories;
+using NotificationService.Application.Abstractions.DataAccess;
 using NotificationService.Core.Models;
 using NotificationService.DataAccess.Configurations;
 using NotificationService.DataAccess.Data;

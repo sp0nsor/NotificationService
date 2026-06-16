@@ -1,4 +1,4 @@
-﻿namespace NotificationService.Infrastructure.RabbitMQ.Settings
+﻿namespace NotificationService.Infrastructure.Messaging.RabbitMQ.Options
 {
     public class RabbitMqOptions
     {

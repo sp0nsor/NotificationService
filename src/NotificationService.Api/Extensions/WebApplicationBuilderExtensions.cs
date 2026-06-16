@@ -1,4 +1,4 @@
-﻿using NotificationService.Core.Abstractions;
+﻿using NotificationService.Application.Abstractions.DataAccess;
 
 namespace NotificationService.Api.Extensions
 {

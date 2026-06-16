@@ -1,0 +1,16 @@
+﻿using NotificationService.Application.Abstractions.Integrations;
+using NotificationService.Application.DTOs;
+using NotificationService.Core.Primitives.Enums;
+
+namespace NotificationService.Infrastructure.Integrations.UserService
+{
+    public sealed class UserServiceClient : IUserServiceClient
+    {
+        public async Task<List<UserContactsDto>> GetContacts(Guid id)
+        {
+            await Task.Delay(1000);
+
+            return new List<UserContactsDto>() { new UserContactsDto(id, Provider.Telegram, "test") };
+        }
+    }
+}

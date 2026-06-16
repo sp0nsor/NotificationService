@@ -1,24 +1,25 @@
 using NotificationService.Api.Extensions;
 using NotificationService.DataAccess.Extentions;
-using NotificationService.Infrastructure.RabbitMQ.Extentions;
+using NotificationService.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
 services.AddDatabaseConfig(builder.Configuration);
-services.AddRabbitMqMessaging(builder.Configuration);
+services.AddInfrastructure(builder.Configuration);
 
 services.AddControllers();
 services.AddSwaggerGen();
 
 var app = builder.Build();
 
+await app.InitializeDatabaseAsync();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-await app.InitializeDatabaseAsync();
+app.MapControllers();
 
 app.Run();
