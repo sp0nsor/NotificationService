@@ -5,6 +5,8 @@ using NotificationService.Infrastructure.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
+services.AddHttpClient();
+
 services.AddDatabaseConfig(builder.Configuration);
 services.AddInfrastructure(builder.Configuration);
 

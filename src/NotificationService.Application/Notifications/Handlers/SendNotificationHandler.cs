@@ -78,6 +78,8 @@ namespace NotificationService.Application.Notifications.Handlers
                 await sender
                     .SendAsync(notificationModel, cancellationToken);
 
+                notificationModel.ChangeStatus(Status.Sent);
+
             }
             catch (NotificationTemporaryException ex)
             {

@@ -13,7 +13,7 @@ namespace NotificationService.Infrastructure.Extensions
             IConfiguration configuration)
         {
             services.AddIntegrations();
-            services.AddNotificationSenders();
+            services.AddNotificationSenders(configuration);
             services.AddRabbitMqMessaging(configuration);
         }
     }

@@ -10,7 +10,7 @@ namespace NotificationService.Infrastructure.Integrations.UserService
         {
             await Task.Delay(1000);
 
-            return new List<UserContactsDto>() { new UserContactsDto(id, Provider.Telegram, "test") };
+            return new List<UserContactsDto>() { new UserContactsDto(id, Provider.Telegram, "682854836") };
         }
     }
 }

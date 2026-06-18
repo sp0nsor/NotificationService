@@ -1,15 +1,23 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using NotificationService.Application.Abstractions.Notifications;
 using NotificationService.Infrastructure.Notifications.Email;
-using NotificationService.Infrastructure.Notifications.Telegram;
+using NotificationService.Infrastructure.Notifications.Telegram.Options;
+using NotificationService.Infrastructure.Notifications.Telegram.Services;
 
 namespace NotificationService.Infrastructure.Notifications.Extensions
 {
     internal static class ServiceCollectionExtensions
     {
-        public static void AddNotificationSenders(this IServiceCollection services)
+        public static void AddNotificationSenders(
+            this IServiceCollection services,
+            IConfiguration configuration)
         {
+            services.Configure<TelegramOptions>(
+                configuration.GetSection(nameof(TelegramOptions)));
+
             services.AddScoped<INotificationSender, TelegramSender>();
+
             services.AddScoped<INotificationSender, EmailSender>();
 
             services.AddScoped<INotificationSenderResolver, NotificationSenderResolver>();
