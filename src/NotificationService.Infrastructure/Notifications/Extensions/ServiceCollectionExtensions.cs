@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NotificationService.Application.Abstractions.Notifications;
-using NotificationService.Infrastructure.Notifications.Email;
+using NotificationService.Infrastructure.Notifications.Email.Options;
+using NotificationService.Infrastructure.Notifications.Email.Services;
 using NotificationService.Infrastructure.Notifications.Telegram.Options;
 using NotificationService.Infrastructure.Notifications.Telegram.Services;
 
@@ -15,6 +16,9 @@ namespace NotificationService.Infrastructure.Notifications.Extensions
         {
             services.Configure<TelegramOptions>(
                 configuration.GetSection(nameof(TelegramOptions)));
+
+            services.Configure<SmtpOptions>(
+                configuration.GetSection(nameof(SmtpOptions)));
 
             services.AddScoped<INotificationSender, TelegramSender>();
 
