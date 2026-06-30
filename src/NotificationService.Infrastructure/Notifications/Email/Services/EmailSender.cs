@@ -9,7 +9,7 @@ using NotificationService.Infrastructure.Notifications.Email.Options;
 
 namespace NotificationService.Infrastructure.Notifications.Email.Services
 {
-    public sealed class EmailSender
+    internal sealed class EmailSender
         : INotificationSender
     {
         private readonly SmtpOptions _options;

@@ -5,7 +5,7 @@ using NotificationService.DataAccess.Extentions;
 
 namespace NotificationService.DataAccess.Data
 {
-    public class DbInitializer : IDbInitializer
+    internal sealed class DbInitializer : IDbInitializer
     {
         public DbInitializer(
             IMongoDatabase database)

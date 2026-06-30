@@ -2,7 +2,7 @@
 
 namespace NotificationService.Infrastructure.Messaging.RabbitMQ.Services
 {
-    public class RabbitMqMessageBus : IMessageBus
+    internal sealed class RabbitMqMessageBus : IMessageBus
     {
         private readonly Wolverine.IMessageBus _bus;
 

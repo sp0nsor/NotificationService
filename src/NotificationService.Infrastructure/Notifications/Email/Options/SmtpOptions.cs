@@ -1,6 +1,6 @@
 ﻿namespace NotificationService.Infrastructure.Notifications.Email.Options
 {
-    public class SmtpOptions
+    internal class SmtpOptions
     {
         public required string Host { get; set; }
         public required int Port { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace NotificationService.Infrastructure.Messaging.RabbitMQ.Options
 {
-    public class RabbitMqOptions
+    internal sealed class RabbitMqOptions
     {
         public required string ConnectionString { get; set; }
         public required string ExchangeName { get; set; }

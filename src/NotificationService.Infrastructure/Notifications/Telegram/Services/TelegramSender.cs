@@ -10,7 +10,7 @@ using System.Net.Http.Json;
 
 namespace NotificationService.Infrastructure.Notifications.Telegram.Services
 {
-    public sealed class TelegramSender
+    internal sealed class TelegramSender
         : INotificationSender
     {
         private readonly HttpClient _httpClient;
