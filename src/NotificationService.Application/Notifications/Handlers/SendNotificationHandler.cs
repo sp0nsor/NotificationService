@@ -2,8 +2,8 @@
 using NotificationService.Application.Abstractions.DataAccess;
 using NotificationService.Application.Abstractions.Integrations;
 using NotificationService.Application.Abstractions.Notifications;
-using NotificationService.Application.Exceptions;
 using NotificationService.Application.Notifications.Commands;
+using NotificationService.Application.Notifications.Context;
 using NotificationService.Core.Exceptions;
 using NotificationService.Core.Models;
 using NotificationService.Core.Primitives.Enums;
@@ -16,15 +16,18 @@ namespace NotificationService.Application.Notifications.Handlers
         private readonly IBaseRepository<Notification> _notificationRepository;
         private readonly IUserServiceClient _userServiceClient;
         private readonly INotificationSenderResolver _senderResolver;
+        private readonly NotificationExecutionContext _context;
 
         public SendNotificationHandler(
             IBaseRepository<Notification> notificationRepository,
             IUserServiceClient userServiceClient,
-            INotificationSenderResolver senderResolver)
+            INotificationSenderResolver senderResolver,
+            NotificationExecutionContext context)
         {
             _notificationRepository = notificationRepository;
             _userServiceClient = userServiceClient;
             _senderResolver = senderResolver;
+            _context = context;
         }
 
         public async Task Handle(
@@ -62,7 +65,7 @@ namespace NotificationService.Application.Notifications.Handlers
 
             if (notificationResult.IsFailure)
             {
-                throw new BadRequestException(notificationResult.Error);
+                throw new ValidationException(notificationResult.Error);
             }
 
             var notificationModel = notificationResult.Value;
@@ -70,38 +73,15 @@ namespace NotificationService.Application.Notifications.Handlers
             await _notificationRepository
                 .AddAsync(notificationModel, cancellationToken);
 
+            _context.Notification = notificationModel;
+
             var sender = _senderResolver
                 .Resolve(notificationRequest.Provider);
 
-            try
-            {
-                await sender
-                    .SendAsync(notificationModel, cancellationToken);
+            await sender
+                .SendAsync(notificationModel, cancellationToken);
 
-                notificationModel.ChangeStatus(Status.Sent);
-
-            }
-            catch (NotificationTemporaryException ex)
-            {
-                notificationModel.SetLastError(ex.Message);
-
-                notificationModel.ChangeStatus(Status.Retrying);
-
-                throw;
-            }
-            catch (Exception ex)
-            {
-                notificationModel.SetLastError(ex.Message);
-
-                notificationModel.ChangeStatus(Status.Failed);
-
-                throw;
-            }
-            finally
-            {
-                await _notificationRepository
-                    .UpdateAsync(notificationModel, cancellationToken);
-            }
+            notificationModel.ChangeStatus(Status.Sent);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace NotificationService.DataAccess.Repositories
 {
-    public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : Entity
+    internal abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : Entity
     {
         protected BaseRepository(IMongoDatabase database)
         {

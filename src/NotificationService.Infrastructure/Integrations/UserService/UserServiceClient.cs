@@ -4,7 +4,7 @@ using NotificationService.Core.Primitives.Enums;
 
 namespace NotificationService.Infrastructure.Integrations.UserService
 {
-    public sealed class UserServiceClient : IUserServiceClient
+    internal sealed class UserServiceClient : IUserServiceClient
     {
         public async Task<List<UserContactsDto>> GetContacts(Guid id)
         {

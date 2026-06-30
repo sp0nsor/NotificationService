@@ -3,7 +3,7 @@ using MongoDB.Driver;
 
 namespace NotificationService.DataAccess.Extentions
 {
-    public static class MongoDbExtentions
+    internal static class MongoDbExtentions
     {
         public static async Task<bool> TryAddCollectionIfNotExistsAsync(
             this IMongoDatabase database,
