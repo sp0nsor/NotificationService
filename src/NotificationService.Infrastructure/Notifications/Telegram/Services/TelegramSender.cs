@@ -36,24 +36,34 @@ namespace NotificationService.Infrastructure.Notifications.Telegram.Services
                 text = notification.Content.Value
             };
 
-            var response = await _httpClient.PostAsJsonAsync(
-                $"https://api.telegram.org/bot{_options.BotToken}/sendMessage",
-                request,
-                cancellationToken);
-
-            if ((int)response.StatusCode >= 500)
+            try
             {
-                throw new NotificationTemporaryException(
-                    "Telegram API temporarily unavailable.");
+                var response = await _httpClient.PostAsJsonAsync(
+                    $"https://api.telegram.org/bot{_options.BotToken}/sendMessage",
+                    request,
+                    cancellationToken);
+
+                if ((int)response.StatusCode >= 500)
+                {
+                    throw new NotificationTemporaryException(
+                        "Telegram API temporarily unavailable.");
+                }
+
+                var result = await response.Content.ReadFromJsonAsync<TelegramResponse>();
+
+                if (result is null || !result.Ok)
+                {
+                    throw new BadRequestException(
+                        result?.Description ?? "Telegram send failed.");
+                }
             }
-
-            var result = await response.Content
-                .ReadFromJsonAsync<TelegramResponse>(cancellationToken);
-
-            if (result is null || !result.Ok)
+            catch (BadRequestException)
             {
-                throw new BadRequestException(
-                    result?.Decsription ?? "Telegram send failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new NotificationTemporaryException(ex.Message);
             }
         }
     }

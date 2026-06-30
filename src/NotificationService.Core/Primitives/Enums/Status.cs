@@ -4,7 +4,6 @@
     {
         Processing = 0,
         Sent = 1,
-        Retrying = 2,
-        Failed = 3,
+        Failed = 2,
     }
 }

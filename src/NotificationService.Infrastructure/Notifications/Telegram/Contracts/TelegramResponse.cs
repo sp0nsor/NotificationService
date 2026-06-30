@@ -2,5 +2,5 @@
 {
     internal record TelegramResponse(
         bool Ok,
-        string? Decsription);
+        string? Description);
 }
