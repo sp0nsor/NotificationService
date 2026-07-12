@@ -3,9 +3,12 @@ using NotificationService.DataAccess.Extentions;
 using NotificationService.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddElk();
+
 var services = builder.Services;
 
-services.AddHttpClient();
+//services.AddHttpClient();
 
 services.AddDatabaseConfig(builder.Configuration);
 services.AddInfrastructure(builder.Configuration);
