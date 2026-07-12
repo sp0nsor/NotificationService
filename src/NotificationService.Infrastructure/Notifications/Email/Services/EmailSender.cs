@@ -1,22 +1,20 @@
-﻿using MailKit.Net.Smtp;
-using Microsoft.Extensions.Options;
-using MimeKit;
-using NotificationService.Application.Abstractions.Notifications;
-using NotificationService.Application.Exceptions;
+﻿using NotificationService.Application.Abstractions.Notifications;
 using NotificationService.Core.Models;
 using NotificationService.Core.Primitives.Enums;
-using NotificationService.Infrastructure.Notifications.Email.Options;
+using NotificationService.Infrastructure.Notifications.Email.Contracts;
+using NotificationService.Infrastructure.Notifications.Email.Exceptions;
 
 namespace NotificationService.Infrastructure.Notifications.Email.Services
 {
-    internal sealed class EmailSender
+    public sealed class EmailSender
         : INotificationSender
     {
-        private readonly SmtpOptions _options;
+        private readonly IEmailClient _emailClient;
 
-        public EmailSender(IOptions<SmtpOptions> options)
+        public EmailSender(
+            IEmailClient emailClient)
         {
-            _options = options.Value;
+            _emailClient = emailClient;
         }
 
         public Provider Provider => Provider.Email;
@@ -25,51 +23,20 @@ namespace NotificationService.Infrastructure.Notifications.Email.Services
             Notification notification,
             CancellationToken cancellationToken = default)
         {
+            var email = new EmailMessage(
+                notification.Recipient.Value,
+                notification.Content.Subject,
+                notification.Content.Value);
+
             try
             {
-                var message = new MimeMessage();
-
-                message.From.Add(
-                    new MailboxAddress(
-                        _options.SenderName,
-                        _options.SenderEmail));
-
-                message.To.Add(
-                    MailboxAddress.Parse(
-                        notification.Recipient.Value));
-
-                message.Body = new TextPart("html")
-                {
-                    Text = notification.Content.Value
-                };
-
-                message.Subject = "Super Puper Subject";
-
-                using var client = new SmtpClient();
-
-                await client.ConnectAsync(
-                    _options.Host,
-                    _options.Port,
-                    MailKit.Security.SecureSocketOptions.StartTls,
-                    cancellationToken);
-
-                await client.AuthenticateAsync(
-                    _options.UserName,
-                    _options.Password,
-                    cancellationToken);
-
-                var response = await client.SendAsync(
-                    message,
-                    cancellationToken);
-
-                await client.DisconnectAsync(
-
-                    true,
+                await _emailClient.SendMessageAsync(
+                    email,
                     cancellationToken);
             }
             catch (Exception ex)
             {
-                throw new NotificationTemporaryException(ex.Message);
+                throw EmailExceptionMapper.Map(ex);
             }
         }
     }

@@ -7,12 +7,13 @@ namespace NotificationService.Core.Models
     public class Notification : Primitives.Entity
     {
         private Notification(
+            Guid id,
             Status status,
             Recipient recipient,
             Content content,
             DateTime createdAt)
         {
-            Id = Guid.NewGuid();
+            Id = id;
             Status = status;
             Recipient = recipient;
             Content = content;
@@ -26,9 +27,9 @@ namespace NotificationService.Core.Models
         public DateTime? SentAt { get; private set; }
         public string? Error { get; private set; }
 
-        public static Result<Notification> Create(Status status, Recipient recipient, Content content)
+        public static Result<Notification> Create(Guid id, Status status, Recipient recipient, Content content)
         {
-            return new Notification(status, recipient, content, DateTime.UtcNow);
+            return new Notification(id, status, recipient, content, DateTime.UtcNow);
         }
 
         public Result ChangeStatus(Status newStatus)

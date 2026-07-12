@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NotificationService.Application.Exceptions;
 using NotificationService.Application.Notifications.Commands;
 using NotificationService.Application.Notifications.Handlers;
-using NotificationService.Application.Notifications.Middlerware;
+using NotificationService.Core.Exceptions;
 using NotificationService.Infrastructure.Messaging.RabbitMQ.Options;
 using NotificationService.Infrastructure.Messaging.RabbitMQ.Services;
 using Wolverine;
@@ -51,13 +51,35 @@ namespace NotificationService.Infrastructure.Messaging.RabbitMQ.Extentions
 
                 opts.Policies
                     .OnException<NotificationTemporaryException>()
-                    .RetryWithCooldown(
-                        1.Seconds(),
-                        5.Seconds(),
-                        15.Seconds());
+                    .RetryWithCooldown(1.Seconds(), 5.Seconds(), 15.Seconds())
+                    .And(async (_, context, exception) =>
+                    {
+                        if (context.Envelope?.Message is SendNotificationMessage message)
+                        {
+                            await context.SendAsync(
+                                new NotificationFailedMessage(
+                                        message.NotificationId,
+                                        exception.Message));
+                        }
+                    });
 
                 opts.Policies
-                    .AddMiddleware<NotificationStatusMeddleware>();
+                    .OnException<BadRequestException>()
+                    .Discard()
+                    .And(async (_, context, exception) =>
+                    {
+                        if (context.Envelope?.Message is SendNotificationMessage message)
+                        {
+                            await context.SendAsync(
+                                new NotificationFailedMessage(
+                                        message.NotificationId,
+                                        exception.Message));
+                        }
+                    });
+
+                opts.Policies
+                    .OnException<Exception>()
+                    .Discard();
 
                 opts.DefaultExecutionTimeout = TimeSpan.FromMinutes(1);
                 opts.DefaultRemoteInvocationTimeout = TimeSpan.FromMinutes(1);

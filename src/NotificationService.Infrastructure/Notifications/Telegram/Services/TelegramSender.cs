@@ -1,69 +1,42 @@
-﻿using Microsoft.Extensions.Options;
-using NotificationService.Application.Abstractions.Notifications;
-using NotificationService.Application.Exceptions;
-using NotificationService.Core.Exceptions;
+﻿using NotificationService.Application.Abstractions.Notifications;
 using NotificationService.Core.Models;
 using NotificationService.Core.Primitives.Enums;
+using NotificationService.Infrastructure.Notifications.Telegram.Clients;
 using NotificationService.Infrastructure.Notifications.Telegram.Contracts;
-using NotificationService.Infrastructure.Notifications.Telegram.Options;
-using System.Net.Http.Json;
+using NotificationService.Infrastructure.Notifications.Telegram.Exceptions;
 
 namespace NotificationService.Infrastructure.Notifications.Telegram.Services
 {
-    internal sealed class TelegramSender
+    public sealed class TelegramSender
         : INotificationSender
     {
-        private readonly HttpClient _httpClient;
-        private readonly TelegramOptions _options;
+        private readonly ITelegramClient _telegramClient;
 
         public Provider Provider => Provider.Telegram;
 
         public TelegramSender(
-            HttpClient httpClient,
-            IOptions<TelegramOptions> options)
+            ITelegramClient telegramClient)
         {
-            _httpClient = httpClient;
-            _options = options.Value;
+            _telegramClient = telegramClient;
         }
 
         public async Task SendAsync(
             Notification notification,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
-            var request = new
-            {
-                chat_id = notification.Recipient.Value,
-                text = notification.Content.Value
-            };
+            var request = new TelegramRequest(
+                notification.Recipient.Value,
+                notification.Content.Value);
 
             try
             {
-                var response = await _httpClient.PostAsJsonAsync(
-                    $"https://api.telegram.org/bot{_options.BotToken}/sendMessage",
+                await _telegramClient.SendMessageAsync(
                     request,
                     cancellationToken);
-
-                if ((int)response.StatusCode >= 500)
-                {
-                    throw new NotificationTemporaryException(
-                        "Telegram API temporarily unavailable.");
-                }
-
-                var result = await response.Content.ReadFromJsonAsync<TelegramResponse>();
-
-                if (result is null || !result.Ok)
-                {
-                    throw new BadRequestException(
-                        result?.Description ?? "Telegram send failed.");
-                }
-            }
-            catch (BadRequestException)
-            {
-                throw;
             }
             catch (Exception ex)
             {
-                throw new NotificationTemporaryException(ex.Message);
+                throw TelegramExceptionMapper.Map(ex);
             }
         }
     }
